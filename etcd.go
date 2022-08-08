@@ -11,14 +11,14 @@ import (
 )
 
 func initServerIP() {
-	if INSECT_SERVER_URL != "" {
+	if ServerUrl != "" {
 		return
 	}
 	address, _ := net.InterfaceAddrs()
 	for _, addr := range address {
 		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
-				INSECT_SERVER_URL = ipnet.IP.String()
+				ServerUrl = ipnet.IP.String()
 			}
 		}
 	}
@@ -27,7 +27,7 @@ func initServerIP() {
 func initEtcdCli() {
 	cfg := clientv3.Config{
 		Endpoints:   []string{GlobalEtcdAddress},
-		DialTimeout: 1 * time.Second,
+		DialTimeout: 5 * time.Second,
 		Username:    EtcdUser,
 		Password:    EtcdPassword,
 	}
@@ -39,11 +39,11 @@ func initEtcdCli() {
 }
 
 func putWithLease() {
-	server := fmt.Sprintf("/prom/local/gateway/prod/%s", INSECT_SERVER_NAME)
+	server := fmt.Sprintf("/prom/local/gateway/prod/%s", ServerName)
 	key := fmt.Sprintf("%s_%s", server, uuid.NewV4().String())
-	value := INSECT_SERVER_URL
-	if INSECT_SERVER_PORT != 0 {
-		value = fmt.Sprintf("%s:%d", INSECT_SERVER_URL, INSECT_SERVER_PORT)
+	value := ServerUrl
+	if ServerPort != 0 {
+		value = fmt.Sprintf("%s:%d", ServerUrl, ServerPort)
 	}
 
 	lease := clientv3.NewLease(GlobalEtcdCLI)
@@ -61,12 +61,16 @@ func putWithLease() {
 }
 
 func EtcdProxy() {
-	if INSECT_SERVER_NAME != "" {
+	if ServerName != "" {
+		ticker := time.NewTicker(time.Duration(GlobalEtcdTTL-1) * time.Second)
+		defer ticker.Stop()
+
 		initEtcdCli()
 		initServerIP()
+
 		for {
 			putWithLease()
-			time.Sleep(time.Duration(GlobalEtcdTTL) * time.Second)
+			<-ticker.C
 		}
 	}
 }

@@ -7,10 +7,10 @@ import (
 var GlobalEtcdCLI = &clientv3.Client{}
 
 var GlobalEtcdAddress = ""
-var GlobalEtcdTTL int64 = 1
+var GlobalEtcdTTL int64 = 2
 
-var INSECT_SERVER_NAME = ""
-var INSECT_SERVER_URL = ""
-var INSECT_SERVER_PORT int = 0
+var ServerName = ""
+var ServerUrl = ""
+var ServerPort int
 var EtcdUser = ""
 var EtcdPassword = ""
