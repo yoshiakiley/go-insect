@@ -28,6 +28,8 @@ func initEtcdCli() {
 	cfg := clientv3.Config{
 		Endpoints:   []string{GlobalEtcdAddress},
 		DialTimeout: 1 * time.Second,
+		Username:    EtcdUser,
+		Password:    EtcdPassword,
 	}
 	cli, err := clientv3.New(cfg)
 	if err != nil {

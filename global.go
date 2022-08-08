@@ -12,3 +12,5 @@ var GlobalEtcdTTL int64 = 1
 var INSECT_SERVER_NAME = ""
 var INSECT_SERVER_URL = ""
 var INSECT_SERVER_PORT int = 0
+var EtcdUser = ""
+var EtcdPassword = ""
