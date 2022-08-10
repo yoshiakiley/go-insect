@@ -26,10 +26,10 @@ func initServerIP() {
 
 func initEtcdCli() {
 	cfg := clientv3.Config{
-		Endpoints:   []string{GlobalEtcdAddress},
-		DialTimeout: 5 * time.Second,
-		Username:    EtcdUser,
-		Password:    EtcdPassword,
+		Endpoints: []string{GlobalEtcdAddress},
+		//DialTimeout: 5 * time.Second,
+		Username: EtcdUser,
+		Password: EtcdPassword,
 	}
 	cli, err := clientv3.New(cfg)
 	if err != nil {
@@ -38,9 +38,9 @@ func initEtcdCli() {
 	GlobalEtcdCLI = cli
 }
 
-func putWithLease() {
+func putWithLease(serverUuid string) {
 	server := fmt.Sprintf("/prom/local/gateway/prod/%s", ServerName)
-	key := fmt.Sprintf("%s_%s", server, uuid.NewV4().String())
+	key := fmt.Sprintf("%s_%s", server, serverUuid)
 	value := ServerUrl
 	if ServerPort != 0 {
 		value = fmt.Sprintf("%s:%d", ServerUrl, ServerPort)
@@ -63,13 +63,15 @@ func putWithLease() {
 func EtcdProxy() {
 	if ServerName != "" {
 		ticker := time.NewTicker(time.Duration(GlobalEtcdTTL-1) * time.Second)
+		serverUuid := uuid.NewV4().String()
 		defer ticker.Stop()
 
 		initEtcdCli()
 		initServerIP()
 
 		for {
-			putWithLease()
+
+			putWithLease(serverUuid)
 			<-ticker.C
 		}
 	}
