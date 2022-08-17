@@ -26,10 +26,10 @@ func initServerIP() {
 
 func initEtcdCli() {
 	cfg := clientv3.Config{
-		Endpoints: []string{GlobalEtcdAddress},
-		//DialTimeout: 5 * time.Second,
-		Username: EtcdUser,
-		Password: EtcdPassword,
+		Endpoints:   []string{GlobalEtcdAddress},
+		DialTimeout: 5 * time.Second,
+		Username:    EtcdUser,
+		Password:    EtcdPassword,
 	}
 	cli, err := clientv3.New(cfg)
 	if err != nil {
