@@ -33,6 +33,7 @@ func initEtcdCli() {
 	}
 	cli, err := clientv3.New(cfg)
 	if err != nil {
+		fmt.Println(err)
 		GlobalEtcdCLI = nil
 	}
 	GlobalEtcdCLI = cli
@@ -44,6 +45,10 @@ func putWithLease(serverUuid string) {
 	value := ServerUrl
 	if ServerPort != 0 {
 		value = fmt.Sprintf("%s:%d", ServerUrl, ServerPort)
+	}
+	if GlobalEtcdCLI == nil {
+		fmt.Println("GlobalEtcdCLI is nil")
+		return
 	}
 
 	lease := clientv3.NewLease(GlobalEtcdCLI)
