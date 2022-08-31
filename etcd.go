@@ -48,6 +48,7 @@ func putWithLease(serverUuid string) {
 	}
 	if GlobalEtcdCLI == nil {
 		fmt.Println("GlobalEtcdCLI is nil")
+		initEtcdCli()
 		return
 	}
 
@@ -67,7 +68,7 @@ func putWithLease(serverUuid string) {
 
 func EtcdProxy() {
 	if ServerName != "" {
-		ticker := time.NewTicker(time.Duration(GlobalEtcdTTL-1) * time.Second)
+		ticker := time.NewTicker(time.Duration(1) * time.Second)
 		serverUuid := uuid.NewV4().String()
 		defer ticker.Stop()
 
@@ -75,7 +76,6 @@ func EtcdProxy() {
 		initServerIP()
 
 		for {
-
 			putWithLease(serverUuid)
 			<-ticker.C
 		}
